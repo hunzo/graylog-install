@@ -1,7 +1,6 @@
 # Graylog install
-- edit .env for your domain_name or your_ip_address
-- default username and password admin/admin
-- check elasticsearch version for graylog 
+- generate your graylog admin password web ui by genpassword.sh
+- edit .env for your GRAYLOG_ROOT_PASSWORD_SHA2, GRAYLOG_PASSWORD_SECRET and GRAYLOG_HTTP_EXTERNAL_URI
 ```
 https://docs.graylog.org/en/4.0/pages/configuration/elasticsearch.html
 ```
