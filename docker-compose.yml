@@ -64,7 +64,7 @@ services:
             # Custom TCP range
             - 601-610:601-610
             # Custom UDP range
-            # - 601-610:601-610/udp
+            - 601-610:601-610/udp
         volumes: 
             - ./plugins:/usr/share/graylog/plugin
             - graylog_data:/usr/share/graylog/data
