@@ -2,21 +2,24 @@ version: '3'
 services:
     # MongoDB: https://hub.docker.com/_/mongo/
     mongo:
-        image: mongo:4.2
+        image: mongo:${MONGO_VERSION-latest}
+        environment:
+            - TZ=Asia/Bangkok
         volumes:
             - mongo_data:/data/db
         networks:
             - graylog
-    # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/7.10/docker.html
+    # Elasticsearch: https://www.elastic.co/guide/en/elasticsearch/reference/8.5/docker.html
     elasticsearch:
-        image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2
+        image: docker.elastic.co/elasticsearch/elasticsearch-oss:${ELK_VERSION-latest}
         volumes:
             - es_data:/usr/share/elasticsearch/data
         environment:
             - http.host=0.0.0.0
             - transport.host=localhost
             - network.host=0.0.0.0
-            - 'ES_JAVA_OPTS=-Xms1024m -Xmx1024m'
+            - TZ=Asia/Bangkok
+            - 'ES_JAVA_OPTS=-Dlog4j2.formatMsgNoLookups=true -Xms1024m -Xmx1024m'
         ulimits:
             memlock:
                 soft: -1
@@ -24,16 +27,18 @@ services:
         deploy:
             resources:
                 limits:
-                    memory: 1g
+                    memory: 2g
         networks:
             - graylog
     # Graylog: https://hub.docker.com/r/graylog/graylog/
     graylog:
-        image: graylog/graylog:4.2.6
+        image: graylog/graylog:${GRAYLOG_VERSION-latest}
         environment:
             - GRAYLOG_PASSWORD_SECRET=${GRAYLOG_PASSWORD_SECRET}
             - GRAYLOG_ROOT_PASSWORD_SHA2=${GRAYLOG_ROOT_PASSWORD_SHA2}
             - GRAYLOG_HTTP_EXTERNAL_URI=${GRAYLOG_HTTP_EXTERNAL_URI}
+            - GRAYLOG_TIMEZONE=Asia/Bangkok
+            - TZ=Asia/Bangkok
         entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
         networks:
             - graylog
@@ -59,7 +64,7 @@ services:
             # Custom TCP range
             - 601-610:601-610
             # Custom UDP range
-            - 601-610:601-610/udp
+            # - 601-610:601-610/udp
         volumes: 
             - ./plugins:/usr/share/graylog/plugin
             - graylog_data:/usr/share/graylog/data
@@ -67,7 +72,6 @@ services:
 # Create networks
 networks:
     graylog:
-        driver: bridge
 
 # Persist data in docker volumes
 volumes:
